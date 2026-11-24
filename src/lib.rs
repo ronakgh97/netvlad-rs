@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow, bail};
 use candle_core::{Device, Tensor};
 use prost::Message;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
 use std::sync::OnceLock;
 
 #[derive(Clone, PartialEq, Message)]
@@ -9,13 +9,11 @@ struct ModelProto {
     #[prost(message, optional, tag = "7")]
     graph: Option<GraphProto>,
 }
-
 #[derive(Clone, PartialEq, Message)]
 struct GraphProto {
     #[prost(message, repeated, tag = "5")]
     initializer: Vec<TensorProto>,
 }
-
 #[derive(Clone, PartialEq, Message)]
 struct TensorProto {
     #[prost(string, tag = "8")]
@@ -31,7 +29,6 @@ struct TensorProto {
     #[prost(bytes = "vec", tag = "9")]
     raw_data: Vec<u8>,
 }
-
 static INITIALIZERS: OnceLock<FxHashMap<String, Tensor>> = OnceLock::new();
 fn decode_model(bytes: &[u8]) -> Result<FxHashMap<String, Tensor>> {
     let model = ModelProto::decode(bytes)?;
@@ -39,7 +36,7 @@ fn decode_model(bytes: &[u8]) -> Result<FxHashMap<String, Tensor>> {
         .graph
         .ok_or_else(|| anyhow!("graph is missing from protobuf file"))?;
 
-    let mut initializers = FxHashMap::with_capacity_and_hasher(38, Default::default());
+    let mut initializers = FxHashMap::with_capacity_and_hasher(38, FxBuildHasher);
     for tensor_proto in graph.initializer {
         let numel = tensor_proto
             .dims
@@ -104,7 +101,7 @@ fn decode_model(bytes: &[u8]) -> Result<FxHashMap<String, Tensor>> {
 
 pub fn load_model_from_bytes(bytes: &[u8]) -> Result<()> {
     let initializers = decode_model(bytes)?;
-    let _ = INITIALIZERS.set(initializers);
+    let _ = INITIALIZERS.set(initializers); // ignore multiple init errors
     Ok(())
 }
 

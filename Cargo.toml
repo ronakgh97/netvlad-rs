@@ -13,3 +13,5 @@ prost = "0.14.6"
 memmap2 = "0.9.12"
 rustc-hash = "2.1.3"
 anyhow = "1.0.105"
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+# tiny-hnsw = { git = "https://github.com/ronakgh97/hnsw-rs" }
