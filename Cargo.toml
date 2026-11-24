@@ -1,6 +1,6 @@
 [package]
 name = "netvlad_rs"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 
 [lib]
@@ -10,5 +10,6 @@ path = "src/lib.rs"
 [dependencies]
 candle-core = { git = "https://github.com/huggingface/candle.git" }
 prost = "0.14.6"
+memmap2 = "0.9.12"
 rustc-hash = "2.1.3"
 anyhow = "1.0.105"
