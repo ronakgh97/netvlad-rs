@@ -2,11 +2,13 @@ use anyhow::Result;
 use candle_core::{Device, Tensor};
 use netvlad_rs::{load_model_from_file, run};
 
-const QUERY_IMAGE: &str = "images/query.png";
+const QUERY_IMAGE: &str = "images/query.jpg";
 const SAMPLE_IMAGES: &[&str] = &[
-    "images/sample0.png",
-    "images/sample1.png",
-    "images/sample2.png",
+    "images/sample0.jpg",
+    "images/sample1.jpg",
+    "images/sample2.jpg",
+    "images/sample3.jpg",
+    "images/sample4.jpg",
 ];
 
 fn main() -> Result<()> {

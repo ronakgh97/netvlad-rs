@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow, bail};
-use candle_core::{Device, Tensor};
+use candle_core::{Device, Shape, Tensor};
 use prost::Message;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use std::sync::OnceLock;
@@ -111,6 +111,11 @@ pub fn load_model_from_file(path: &str) -> Result<()> {
 }
 
 pub fn run(input: Tensor) -> Result<Tensor> {
+    assert_eq!(
+        input.shape(),
+        &Shape::from_dims(&[1, 3, 480, 640]),
+        "input shape must be [1, 3, 480, 640]"
+    );
     let initializers = INITIALIZERS
         .get()
         .ok_or_else(|| anyhow!("model not loaded yet"))?;
@@ -222,7 +227,6 @@ fn test_decode_model() {
 
 #[test]
 fn test_run() {
-    use candle_core::Shape;
     load_model_from_file("netvlad_onnx/netvlad_single.onnx").unwrap();
     let input = Tensor::full(0.0f32, &[1, 3, 480, 640], &Device::Cpu).unwrap();
     let output = run(input).unwrap();
